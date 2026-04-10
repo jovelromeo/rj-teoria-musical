@@ -347,6 +347,8 @@ hr.sep {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 420px;
+  overflow-y: auto;
 }
 
 .grado-row {
@@ -544,6 +546,8 @@ hr.sep {
 }
 .lista-repaso::-webkit-scrollbar { width: 4px; }
 .lista-repaso::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+.grados-ejercicio::-webkit-scrollbar { width: 6px; }
+.grados-ejercicio::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
 
 .item-repaso {
   display: grid;
@@ -720,12 +724,8 @@ hr.sep {
 // pero es compatible: { grado, nota, calidad, acorde, roman } vs { nota, calidad }
 // Solo usamos nota y calidad en este modulo
 
-// Alias para mantener compatibilidad
-const parsearNota = analizarNota;
-const nombEsc = nombrarEscala;
-
 // Constantes especificas del modulo II
-const RAICES = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B'];
+const RAICES_MOD2 = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B'];
 const ORDS_RO = ['I','II','III','IV','V','VI','VII'];
 const CALIDAD_LABEL = { 0: 'may', 1: 'min', 2: 'dis' };
 const CALIDAD_TEXT = { 0: 'mayor', 1: 'menor', 2: 'dis' };
@@ -743,7 +743,7 @@ let selecciones = {}; // gradoIndex -> opción seleccionada
 function generar() {
   const qs = [];
   while (qs.length < 10) {
-    const r = RAICES[Math.floor(Math.random() * RAICES.length)];
+    const r = RAICES_MOD2[Math.floor(Math.random() * RAICES_MOD2.length)];
     const t = Math.random() < 0.5 ? 'mayor' : 'menor';
     const escala = construirEscala(r, t);
     if (escala.every(g => g.nota !== null)) {

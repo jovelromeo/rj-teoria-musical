@@ -707,20 +707,8 @@ hr.sep {
    CONFIGURACION Y UTILIDADES DEL MODULO I
 ═══════════════════════════════════════════════ */
 
-// Usar construirEscalaSimple para compatibilidad (devuelve array de strings)
-const construirEscalaSimple = (raiz, tipo) => {
-  const escala = construirEscala(raiz, tipo);
-  return escala.map(g => g.acorde);
-};
-
-// Alias para mantener compatibilidad con codigo existente
-const parsearNota = analizarNota;
-const parsearAcorde = analizarAcorde;
-const nombEsc = nombrarEscala;
-const coinciden = coincidenAcordes;
-
 // Constantes especificas del modulo I
-const RAICES = ['C','G','D','A','E','B','F#','C#','F','Bb','Eb','Ab','Db','Gb'];
+const RAICES_MOD1 = ['C','G','D','A','E','B','F#','C#','F','Bb','Eb','Ab','Db','Gb'];
 const ORDS   = ['','1.°','2.°','3.°','4.°','5.°','6.°','7.°'];
 const ORDS_RO = ['','I','II','III','IV','V','VI','VII'];
 
@@ -732,7 +720,7 @@ let preguntas=[], actual=0, correctas=0, respondido=false, historial=[];
 function generar() {
   const qs=[];
   while (qs.length<10) {
-    const r = RAICES[Math.floor(Math.random()*RAICES.length)];
+    const r = RAICES_MOD1[Math.floor(Math.random()*RAICES_MOD1.length)];
     const t = Math.random()<.5 ? 'mayor' : 'menor';
     const g = Math.floor(Math.random()*7);
     const e = construirEscalaSimple(r, t);
