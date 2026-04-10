@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memorización de grados II — Teoria Musical - rj</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f4efe6;
+  --surface:   #faf8f4;
+  --surface2:  #f0ebe0;
+  --border:    #ddd5c5;
+  --border2:   #c8bfad;
+  --text:      #28200f;
+  --text-mid:  #6a5c44;
+  --text-dim:  #9e8e78;
+  --accent:    #b87333;
+  --accent-bg: #f5e8d8;
+  --green:     #2e7050;
+  --green-bg:  #daeee4;
+  --blue:      #2d5282;
+  --blue-bg:   #d8e6f5;
+  --rose:      #7a2d52;
+  --rose-bg:   #f0d8e6;
+  --ok:        #2e7050;
+  --ok-bg:     #daeee4;
+  --err:       #7a2d2d;
+  --err-bg:    #f5d8d8;
+  --radius:    10px;
+}
+
+html { font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px 80px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 680px;
+}
+
+/* ─ pantallas ─ */
+.pantalla { display: none; flex-direction: column; }
+.pantalla.activa { display: flex; animation: subir 0.22s ease both; }
+
+@keyframes subir {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─ tipografía ─ */
+.sup-label {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 5px;
+}
+
+.titulo {
+  font-family: 'Lora', serif;
+  font-size: clamp(28px, 6vw, 40px);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.micro {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+hr.sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+/* ─ nav header ─ */
+.nav-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-mid);
+  text-decoration: none;
+  font-size: 18px;
+  transition: all 0.15s;
+}
+
+.nav-back:hover {
+  background: var(--surface2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.nav-title {
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
+/* ══════════════════════════════════════════
+   PANTALLA INICIO
+══════════════════════════════════════════ */
+
+#inicio .cabecera { margin-bottom: 28px; }
+
+.formula-bloque { margin-bottom: 22px; }
+
+.formula-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.formula-nombre {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-mid);
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.paso {
+  width: 30px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  border-radius: 5px;
+  letter-spacing: 0.3px;
+}
+.paso.T { background: var(--accent-bg); color: var(--accent); border: 1px solid #e0c8a8; }
+.paso.S { background: var(--surface2); color: var(--text-mid); border: 1px solid var(--border); }
+
+.formula-leyenda {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.formula-leyenda b { color: var(--text-mid); font-weight: 500; }
+
+.grados-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.grados-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.grados-head {
+  padding: 10px 14px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.grados-body { padding: 10px 14px; }
+
+.grado-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+.grado-fila:last-child { border-bottom: none; }
+
+.grado-num {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-dim);
+  width: 24px;
+}
+
+.grado-tipo {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.grado-tipo.may { background: var(--green-bg); color: var(--green); }
+.grado-tipo.min { background: var(--blue-bg);  color: var(--blue); }
+.grado-tipo.dis { background: var(--rose-bg);  color: var(--rose); }
+
+.btn-primario {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  letter-spacing: 0.2px;
+}
+.btn-primario:hover {
+  background: #160e00;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(40,32,15,0.18);
+}
+.btn-primario:active { transform: none; box-shadow: none; }
+
+.btn-secundario {
+  width: 100%;
+  padding: 14px 20px;
+  background: transparent;
+  color: var(--text-mid);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.2px;
+  margin-top: 10px;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+.btn-secundario:hover {
+  border-color: var(--text);
+  color: var(--text);
+  background: var(--surface2);
+}
+
+/* ══════════════════════════════════════════
+   PANTALLA JUEGO
+══════════════════════════════════════════ */
+
+#juego .hud {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.hud-puntaje {
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  color: var(--text-mid);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.hud-barra-track {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.hud-barra-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+.hud-prog {
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Escala header */
+.escala-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.escala-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.escala-nombre {
+  font-family: 'Lora', serif;
+  font-size: clamp(28px, 5vw, 36px);
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Grados grid */
+.grados-ejercicio {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.grado-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.grado-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.grado-numero {
+  font-family: 'Lora', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 30px;
+}
+
+.grado-calidad {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+.grado-calidad.may { background: var(--green-bg); color: var(--green); }
+.grado-calidad.min { background: var(--blue-bg);  color: var(--blue); }
+.grado-calidad.dis { background: var(--rose-bg);  color: var(--rose); }
+
+/* Opciones grid */
+.opciones-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+}
+
+.opcion-btn {
+  padding: 8px 4px;
+  background: var(--bg);
+  border: 1.5px solid var(--border2);
+  border-radius: 6px;
+  font-family: 'Lora', serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: all 0.12s;
+  text-align: center;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.opcion-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.opcion-btn.seleccionado {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.opcion-btn.correcto {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.opcion-btn.incorrecto {
+  border-color: var(--err);
+  background: var(--err-bg);
+  color: var(--err);
+}
+
+.opcion-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* Retroalimentación */
+.retro-ejercicio {
+  margin-top: 16px;
+  padding: 14px;
+  background: var(--surface2);
+  border-radius: 8px;
+  font-size: 13px;
+  display: none;
+}
+.retro-ejercicio.visible { display: block; }
+
+.retro-ok { color: var(--ok); font-weight: 500; }
+.retro-err { color: var(--err); font-weight: 500; }
+
+/* Botón verificar */
+.btn-verif-wrap {
+  margin-top: 20px;
+}
+
+/* ══════════════════════════════════════════
+   PANTALLA RESULTADO
+══════════════════════════════════════════ */
+
+#resultado .cabecera { margin-bottom: 20px; }
+
+.res-score-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.res-num {
+  font-family: 'Lora', serif;
+  font-size: clamp(56px, 13vw, 80px);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.res-num span { color: var(--accent); }
+
+.res-desc { padding-bottom: 6px; }
+.res-veredicto {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--text-mid);
+  margin-bottom: 4px;
+}
+.res-precision {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 10px;
+  text-align: center;
+}
+.stat-num {
+  font-family: 'Lora', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  margin-bottom: 2px;
+}
+.stat-lbl {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.repaso-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.lista-repaso {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 22px;
+}
+.lista-repaso::-webkit-scrollbar { width: 4px; }
+.lista-repaso::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+.item-repaso {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.item-repaso:last-child { border-bottom: none; }
+.item-q { font-family: 'Lora', serif; font-style: italic; color: var(--text-mid); }
+.item-r-ok { font-family: 'Lora', serif; font-style: italic; font-weight: 600; color: var(--ok); }
+.item-r-err { font-family: 'Lora', serif; font-style: italic; font-weight: 600; color: var(--err); }
+.item-ico { font-size: 12px; }
+
+@media (max-width: 640px) {
+  .opciones-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grados-wrap { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .res-score-card { flex-direction: column; gap: 8px; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ══ NAV HEADER ══ -->
+  <nav class="nav-header">
+    <a href="index.html" class="nav-back" title="Volver al inicio">←</a>
+    <span class="nav-title">Módulo II · Memorización de grados II</span>
+  </nav>
+
+  <!-- ══ INICIO ══ -->
+  <div id="inicio" class="pantalla activa">
+
+    <div class="cabecera" style="margin-bottom:26px">
+      <div class="sup-label">entrenamiento musical avanzado</div>
+      <div class="titulo">Grados de escala II</div>
+    </div>
+
+    <div class="micro" style="margin-bottom:12px">Fórmulas de intervalos</div>
+
+    <div class="formula-bloque">
+      <div class="formula-row">
+        <div class="formula-nombre">Mayor</div>
+        <div class="paso T">T</div><div class="paso T">T</div><div class="paso S">S</div>
+        <div class="paso T">T</div><div class="paso T">T</div><div class="paso T">T</div>
+        <div class="paso S">S</div>
+      </div>
+      <div class="formula-row">
+        <div class="formula-nombre">Menor</div>
+        <div class="paso T">T</div><div class="paso S">S</div><div class="paso T">T</div>
+        <div class="paso T">T</div><div class="paso S">S</div><div class="paso T">T</div>
+        <div class="paso T">T</div>
+      </div>
+      <div class="formula-leyenda"><b>T</b> = Tono &nbsp;·&nbsp; <b>S</b> = Semitono</div>
+    </div>
+
+    <hr class="sep">
+
+    <div class="micro" style="margin-bottom:12px">Calidad de los grados</div>
+
+    <div class="grados-wrap">
+      <div class="grados-col">
+        <div class="grados-head">Escala mayor</div>
+        <div class="grados-body">
+          <div class="grado-fila"><div class="grado-num">I</div><div class="grado-tipo may">mayor</div></div>
+          <div class="grado-fila"><div class="grado-num">II</div><div class="grado-tipo min">menor</div></div>
+          <div class="grado-fila"><div class="grado-num">III</div><div class="grado-tipo min">menor</div></div>
+          <div class="grado-fila"><div class="grado-num">IV</div><div class="grado-tipo may">mayor</div></div>
+          <div class="grado-fila"><div class="grado-num">V</div><div class="grado-tipo may">mayor</div></div>
+          <div class="grado-fila"><div class="grado-num">VI</div><div class="grado-tipo min">menor</div></div>
+          <div class="grado-fila"><div class="grado-num">VII</div><div class="grado-tipo dis">disminuido</div></div>
+        </div>
+      </div>
+      <div class="grados-col">
+        <div class="grados-head">Escala menor</div>
+        <div class="grados-body">
+          <div class="grado-fila"><div class="grado-num">I</div><div class="grado-tipo min">menor</div></div>
+          <div class="grado-fila"><div class="grado-num">II</div><div class="grado-tipo dis">disminuido</div></div>
+          <div class="grado-fila"><div class="grado-num">III</div><div class="grado-tipo may">mayor</div></div>
+          <div class="grado-fila"><div class="grado-num">IV</div><div class="grado-tipo min">menor</div></div>
+          <div class="grado-fila"><div class="grado-num">V</div><div class="grado-tipo min">menor</div></div>
+          <div class="grado-fila"><div class="grado-num">VI</div><div class="grado-tipo may">mayor</div></div>
+          <div class="grado-fila"><div class="grado-num">VII</div><div class="grado-tipo may">mayor</div></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primario" onclick="iniciarJuego()">Comenzar — 10 preguntas</button>
+  </div>
+
+  <!-- ══ JUEGO ══ -->
+  <div id="juego" class="pantalla">
+
+    <div class="hud">
+      <div class="hud-puntaje" id="hud-puntaje">0 correctas</div>
+      <div class="hud-barra-track">
+        <div class="hud-barra-fill" id="hud-fill" style="width:0%"></div>
+      </div>
+      <div class="hud-prog" id="hud-prog">1/10</div>
+    </div>
+
+    <div class="escala-header">
+      <div class="escala-label">Construye los grados de</div>
+      <div class="escala-nombre" id="escala-nombre">A mayor</div>
+    </div>
+
+    <div class="grados-ejercicio" id="grados-container">
+      <!-- Generado dinámicamente -->
+    </div>
+
+    <div class="retro-ejercicio" id="retro-ejercicio">
+      <span id="retro-texto"></span>
+    </div>
+
+    <div class="btn-verif-wrap">
+      <button class="btn-primario" id="btn-verif" onclick="verificar()">Verificar respuestas</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULTADO ══ -->
+  <div id="resultado" class="pantalla">
+
+    <div class="cabecera">
+      <div class="sup-label">sesión completada</div>
+      <div class="titulo">Resultados</div>
+    </div>
+
+    <div class="res-score-card">
+      <div class="res-num" id="res-num">0<span>/10</span></div>
+      <div class="res-desc">
+        <div class="res-veredicto" id="res-veredicto">—</div>
+        <div class="res-precision" id="res-precision">0% de precisión</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-num" id="s-ok">0</span>
+        <span class="stat-lbl">Correctas</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num" id="s-err">0</span>
+        <span class="stat-lbl">Incorrectas</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-num" id="s-pct">0%</span>
+        <span class="stat-lbl">Precisión</span>
+      </div>
+    </div>
+
+    <div class="repaso-header">
+      <div class="micro">Repaso de respuestas</div>
+    </div>
+
+    <div class="lista-repaso" id="lista-repaso"></div>
+
+    <button class="btn-primario" onclick="reiniciar()">Volver a jugar</button>
+    <a href="index.html" class="btn-secundario">← Volver al inicio</a>
+  </div>
+
+</div>
+<script>
+/* ═══════════════════════════════════════════════
+   MOTOR MUSICAL
+═══════════════════════════════════════════════ */
+
+const LETRAS = ['C','D','E','F','G','A','B'];
+const SEMI_NAT = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+const DELTA_A = { '##':2, '#':1, '':0, 'b':-1, 'bb':-2 };
+
+// Todas las raíces posibles
+const RAICES = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B'];
+const ORDS_RO = ['I','II','III','IV','V','VI','VII'];
+const CALIDAD_LABEL = { 0: 'may', 1: 'min', 2: 'dis' };
+const CALIDAD_TEXT = { 0: 'mayor', 1: 'menor', 2: 'dis' };
+
+function parsearNota(n) {
+  const l = n[0];
+  const a = n.slice(1);
+  const alteracion = a === 'b' ? 'b' : a === '#' ? '#' : a === 'bb' ? 'bb' : a === '##' ? '##' : '';
+  const s = ((SEMI_NAT[l] + (DELTA_A[alteracion] ?? 0)) % 12 + 12) % 12;
+  return { l, s, alteracion };
+}
+
+function deletrear(letra, ts) {
+  const nat = SEMI_NAT[letra];
+  let d = ((ts - nat + 12) % 12);
+  if (d === 10) d = -2;
+  if (d === 11) d = -1;
+  const m = {'-2':'bb','-1':'b','0':'','1':'#','2':'##'};
+  const acc = m[String(d)];
+  if (acc === undefined) return null;
+  return letra + acc;
+}
+
+const INT_MAY = [0,2,4,5,7,9,11];
+const INT_MEN = [0,2,3,5,7,8,10];
+const CAL_MAY = [0,1,1,0,0,1,2];
+const CAL_MEN = [1,2,0,1,1,0,0];
+
+function construirEscala(raiz, tipo) {
+  const { l: lr, s: sr } = parsearNota(raiz);
+  const ints = tipo === 'mayor' ? INT_MAY : INT_MEN;
+  const cals = tipo === 'mayor' ? CAL_MAY : CAL_MEN;
+  const ir = LETRAS.indexOf(lr);
+  return ints.map((s, i) => {
+    const nota = deletrear(LETRAS[(ir+i)%7], (sr+s)%12);
+    return { nota, calidad: cals[i] };
+  });
+}
+
+function nombEsc(r, t) {
+  return r + (t === 'mayor' ? '' : 'm');
+}
+
+/* ═══════════════════════════════════════════════
+   ESTADO DEL JUEGO
+═══════════════════════════════════════════════ */
+let preguntas = [];
+let actual = 0;
+let correctas = 0;
+let respondido = false;
+let historial = [];
+let selecciones = {}; // gradoIndex -> opción seleccionada
+
+function generar() {
+  const qs = [];
+  while (qs.length < 10) {
+    const r = RAICES[Math.floor(Math.random() * RAICES.length)];
+    const t = Math.random() < 0.5 ? 'mayor' : 'menor';
+    const escala = construirEscala(r, t);
+    if (escala.every(g => g.nota !== null)) {
+      qs.push({ r, t, nEsc: nombEsc(r, t), escala });
+    }
+  }
+  return qs;
+}
+
+/* ═══════════════════════════════════════════════
+   UI
+═══════════════════════════════════════════════ */
+function mostrar(id) {
+  document.querySelectorAll('.pantalla').forEach(el => el.classList.remove('activa'));
+  const target = document.getElementById(id);
+  target.classList.remove('activa');
+  void target.offsetWidth;
+  target.classList.add('activa');
+}
+
+function actualizarHud() {
+  const pct = (actual / 10) * 100;
+  document.getElementById('hud-fill').style.width = pct + '%';
+  document.getElementById('hud-prog').textContent = (actual + 1) + '/10';
+  document.getElementById('hud-puntaje').textContent = correctas + (correctas === 1 ? ' correcta' : ' correctas');
+}
+
+// Generar las 9 opciones para una nota base
+function generarOpciones(notaBase) {
+  // notaBase es como "A", "Bm", "C#dim"
+  const match = notaBase.match(/^([A-G])(#|b)?(m|dim)?$/);
+  if (!match) return [];
+  
+  const [, letra, alteracion = '', calidad = ''] = match;
+  const calidades = ['', 'm', 'dim'];
+  const alteraciones = ['', '#', 'b'];
+  
+  const opciones = [];
+  for (const alt of alteraciones) {
+    for (const cal of calidades) {
+      opciones.push(letra + alt + cal);
+    }
+  }
+  return opciones;
+}
+
+function renderGrados() {
+  const q = preguntas[actual];
+  const container = document.getElementById('grados-container');
+  container.innerHTML = '';
+  selecciones = {};
+  
+  // Solo grados II al VII (índices 1-6), sin mostrar calidad
+  for (let idx = 1; idx < 7; idx++) {
+    const grado = q.escala[idx];
+    const opciones = generarOpciones(grado.nota);
+    
+    const row = document.createElement('div');
+    row.className = 'grado-row';
+    row.dataset.grado = idx;
+    
+    const info = document.createElement('div');
+    info.className = 'grado-info';
+    info.innerHTML = `<span class="grado-numero">${ORDS_RO[idx]}</span>`;
+    
+    const grid = document.createElement('div');
+    grid.className = 'opciones-grid';
+    
+    opciones.forEach(opcion => {
+      const btn = document.createElement('button');
+      btn.className = 'opcion-btn';
+      btn.textContent = opcion;
+      btn.dataset.opcion = opcion;
+      btn.dataset.grado = idx;
+      btn.onclick = () => seleccionarOpcion(idx, opcion, btn);
+      grid.appendChild(btn);
+    });
+    
+    row.appendChild(info);
+    row.appendChild(grid);
+    container.appendChild(row);
+  }
+}
+
+function seleccionarOpcion(gradoIdx, opcion, btn) {
+  if (respondido) return;
+  
+  // Deseleccionar otras opciones del mismo grado
+  const row = document.querySelector(`.grado-row[data-grado="${gradoIdx}"]`);
+  row.querySelectorAll('.opcion-btn').forEach(b => b.classList.remove('seleccionado'));
+  
+  // Seleccionar esta
+  btn.classList.add('seleccionado');
+  selecciones[gradoIdx] = opcion;
+}
+
+function cargar() {
+  const q = preguntas[actual];
+  document.getElementById('escala-nombre').textContent = (q.t === 'mayor' ? q.r + ' mayor' : q.r + 'm');
+  document.getElementById('retro-ejercicio').classList.remove('visible');
+  document.getElementById('btn-verif').textContent = 'Verificar respuestas';
+  document.getElementById('btn-verif').disabled = false;
+  respondido = false;
+  
+  renderGrados();
+  actualizarHud();
+}
+
+function verificar() {
+  if (respondido) {
+    avanzar();
+    return;
+  }
+  
+  // Verificar que se seleccionó algo en cada grado (II-VII, índices 1-6)
+  const q = preguntas[actual];
+  let todasSeleccionadas = true;
+  for (let i = 1; i < 7; i++) {
+    if (!selecciones[i]) {
+      todasSeleccionadas = false;
+      break;
+    }
+  }
+  
+  if (!todasSeleccionadas) {
+    alert('Por favor selecciona una opción para cada grado');
+    return;
+  }
+  
+  respondido = true;
+  let aciertosEscala = 0;
+  
+  // Evaluar cada grado
+  q.escala.forEach((grado, idx) => {
+    const seleccionada = selecciones[idx];
+    const correcta = grado.nota;
+    const esCorrecta = seleccionada === correcta;
+    
+    if (esCorrecta) aciertosEscala++;
+    
+    const row = document.querySelector(`.grado-row[data-grado="${idx}"]`);
+    row.querySelectorAll('.opcion-btn').forEach(btn => {
+      btn.disabled = true;
+      if (btn.dataset.opcion === correcta) {
+        btn.classList.add('correcto');
+      } else if (btn.dataset.opcion === seleccionada && !esCorrecta) {
+        btn.classList.add('incorrecto');
+      }
+    });
+  });
+  
+  // Una escala se considera correcta si todos los grados están bien
+  const escalaCorrecta = aciertosEscala === 7;
+  if (escalaCorrecta) correctas++;
+  
+  historial.push({
+    q,
+    selecciones: {...selecciones},
+    aciertos: aciertosEscala,
+    correcta: escalaCorrecta
+  });
+  
+  // Mostrar retroalimentación
+  const retro = document.getElementById('retro-ejercicio');
+  const retroTexto = document.getElementById('retro-texto');
+  
+  if (escalaCorrecta) {
+    retroTexto.innerHTML = `<span class="retro-ok">✓ ¡Perfecto! Todos los grados correctos.</span>`;
+  } else {
+    retroTexto.innerHTML = `<span class="retro-err">✗ ${6 - aciertosEscala} grado(s) incorrecto(s). Revisa las respuestas marcadas.</span>`;
+  }
+  retro.classList.add('visible');
+  
+  document.getElementById('btn-verif').textContent = 'Siguiente →';
+}
+
+function avanzar() {
+  actual++;
+  if (actual >= 10) {
+    mostrarResultado();
+  } else {
+    cargar();
+  }
+}
+
+function mostrarResultado() {
+  mostrar('resultado');
+  const pct = Math.round(correctas / 10 * 100);
+  
+  document.getElementById('res-num').innerHTML = correctas + '<span>/10</span>';
+  document.getElementById('s-ok').textContent = correctas;
+  document.getElementById('s-err').textContent = 10 - correctas;
+  document.getElementById('s-pct').textContent = pct + '%';
+  document.getElementById('res-precision').textContent = pct + '% de precisión';
+  document.getElementById('res-veredicto').textContent =
+    pct === 100 ? '¡Maestro absoluto!' :
+    pct >= 80 ? 'Excelente dominio.' :
+    pct >= 60 ? 'Buen progreso.' :
+    pct >= 40 ? 'Sigue practicando.' :
+    'Revisa la teoría.';
+  
+  document.getElementById('lista-repaso').innerHTML = historial.map((h, i) => `
+    <div class="item-repaso">
+      <div class="item-q">${i+1}. ${h.q.nEsc}</div>
+      <div class="${h.correcta ? 'item-r-ok' : 'item-r-err'}">${h.correcta ? '7/7 ✓' : h.aciertos + '/7'}</div>
+      <div class="item-ico">${h.correcta ? '✓' : '✗'}</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   FLUJO
+═══════════════════════════════════════════════ */
+function iniciarJuego() {
+  preguntas = generar();
+  actual = 0;
+  correctas = 0;
+  respondido = false;
+  historial = [];
+  selecciones = {};
+  mostrar('juego');
+  cargar();
+}
+
+function reiniciar() {
+  mostrar('inicio');
+}
+</script>
+</body>
+</html>
