@@ -193,6 +193,17 @@ hr.sep {
   border: 1px solid var(--border);
 }
 
+.modulo-status.soon {
+  background: var(--rose-bg);
+  color: var(--rose);
+}
+
+.modulo-card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .modulo-titulo {
   font-family: 'Lora', serif;
   font-size: 20px;
@@ -323,10 +334,10 @@ hr.sep {
       </a>
 
       <!-- Modulo II -->
-      <a href="modulo2.html" class="modulo-card">
+      <a href="#" class="modulo-card disabled" onclick="return false;">
         <div class="modulo-header">
           <span class="modulo-numero">II</span>
-          <span class="modulo-status disponible">Disponible</span>
+          <span class="modulo-status soon">En desarrollo</span>
         </div>
         <h2 class="modulo-titulo">Memorizacion de grados II</h2>
         <p class="modulo-desc">
