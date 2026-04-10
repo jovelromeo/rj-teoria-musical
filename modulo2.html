@@ -710,59 +710,25 @@ hr.sep {
   </div>
 
 </div>
+<script src="music-theory.js"></script>
 <script>
 /* ═══════════════════════════════════════════════
-   MOTOR MUSICAL
+   CONFIGURACION Y UTILIDADES DEL MODULO II
 ═══════════════════════════════════════════════ */
 
-const LETRAS = ['C','D','E','F','G','A','B'];
-const SEMI_NAT = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
-const DELTA_A = { '##':2, '#':1, '':0, 'b':-1, 'bb':-2 };
+// La funcion construirEscala de music-theory.js devuelve objetos mas completos
+// pero es compatible: { grado, nota, calidad, acorde, roman } vs { nota, calidad }
+// Solo usamos nota y calidad en este modulo
 
-// Todas las raíces posibles
+// Alias para mantener compatibilidad
+const parsearNota = analizarNota;
+const nombEsc = nombrarEscala;
+
+// Constantes especificas del modulo II
 const RAICES = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B'];
 const ORDS_RO = ['I','II','III','IV','V','VI','VII'];
 const CALIDAD_LABEL = { 0: 'may', 1: 'min', 2: 'dis' };
 const CALIDAD_TEXT = { 0: 'mayor', 1: 'menor', 2: 'dis' };
-
-function parsearNota(n) {
-  const l = n[0];
-  const a = n.slice(1);
-  const alteracion = a === 'b' ? 'b' : a === '#' ? '#' : a === 'bb' ? 'bb' : a === '##' ? '##' : '';
-  const s = ((SEMI_NAT[l] + (DELTA_A[alteracion] ?? 0)) % 12 + 12) % 12;
-  return { l, s, alteracion };
-}
-
-function deletrear(letra, ts) {
-  const nat = SEMI_NAT[letra];
-  let d = ((ts - nat + 12) % 12);
-  if (d === 10) d = -2;
-  if (d === 11) d = -1;
-  const m = {'-2':'bb','-1':'b','0':'','1':'#','2':'##'};
-  const acc = m[String(d)];
-  if (acc === undefined) return null;
-  return letra + acc;
-}
-
-const INT_MAY = [0,2,4,5,7,9,11];
-const INT_MEN = [0,2,3,5,7,8,10];
-const CAL_MAY = [0,1,1,0,0,1,2];
-const CAL_MEN = [1,2,0,1,1,0,0];
-
-function construirEscala(raiz, tipo) {
-  const { l: lr, s: sr } = parsearNota(raiz);
-  const ints = tipo === 'mayor' ? INT_MAY : INT_MEN;
-  const cals = tipo === 'mayor' ? CAL_MAY : CAL_MEN;
-  const ir = LETRAS.indexOf(lr);
-  return ints.map((s, i) => {
-    const nota = deletrear(LETRAS[(ir+i)%7], (sr+s)%12);
-    return { nota, calidad: cals[i] };
-  });
-}
-
-function nombEsc(r, t) {
-  return r + (t === 'mayor' ? '' : 'm');
-}
 
 /* ═══════════════════════════════════════════════
    ESTADO DEL JUEGO

@@ -701,65 +701,28 @@ hr.sep {
   </div>
 
 </div>
+<script src="music-theory.js"></script>
 <script>
 /* ═══════════════════════════════════════════════
-   MOTOR MUSICAL — diatónico correcto
+   CONFIGURACION Y UTILIDADES DEL MODULO I
 ═══════════════════════════════════════════════ */
 
-const LETRAS   = ['C','D','E','F','G','A','B'];
-const SEMI_NAT = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
-const DELTA_A  = { '##':2, '#':1, '':0, 'b':-1, 'bb':-2 };
+// Usar construirEscalaSimple para compatibilidad (devuelve array de strings)
+const construirEscalaSimple = (raiz, tipo) => {
+  const escala = construirEscala(raiz, tipo);
+  return escala.map(g => g.acorde);
+};
 
-function parsearNota(n) {
-  const l = n[0], a = n.slice(1);
-  const s = ((SEMI_NAT[l] + (DELTA_A[a] ?? 0)) % 12 + 12) % 12;
-  return { l, s };
-}
+// Alias para mantener compatibilidad con codigo existente
+const parsearNota = analizarNota;
+const parsearAcorde = analizarAcorde;
+const nombEsc = nombrarEscala;
+const coinciden = coincidenAcordes;
 
-function deletrear(letra, ts) {
-  const nat = SEMI_NAT[letra];
-  let d = ((ts - nat + 12) % 12);
-  if (d === 10) d = -2;
-  if (d === 11) d = -1;
-  const m = {'-2':'bb','-1':'b','0':'','1':'#','2':'##'};
-  const acc = m[String(d)];
-  if (acc === undefined) throw new Error(`No se puede deletrear ${letra}→${ts}`);
-  return letra + acc;
-}
-
-const INT_MAY = [0,2,4,5,7,9,11];
-const INT_MEN = [0,2,3,5,7,8,10];
-const CAL_MAY = [0,1,1,0,0,1,2]; // 0=may 1=min 2=dis
-const CAL_MEN = [1,2,0,1,1,0,0];
-
-function fmt(nota, c) { return nota + (c===1?'m': c===2?'dim':''); }
-
-function construirEscala(raiz, tipo) {
-  const { l: lr, s: sr } = parsearNota(raiz);
-  const ints = tipo==='mayor' ? INT_MAY : INT_MEN;
-  const cals = tipo==='mayor' ? CAL_MAY : CAL_MEN;
-  const ir   = LETRAS.indexOf(lr);
-  return ints.map((s, i) => fmt(deletrear(LETRAS[(ir+i)%7], (sr+s)%12), cals[i]));
-}
-
+// Constantes especificas del modulo I
 const RAICES = ['C','G','D','A','E','B','F#','C#','F','Bb','Eb','Ab','Db','Gb'];
 const ORDS   = ['','1.°','2.°','3.°','4.°','5.°','6.°','7.°'];
 const ORDS_RO = ['','I','II','III','IV','V','VI','VII'];
-
-function nombEsc(r, t) { return r + (t==='mayor'?'':'m'); }
-
-function parsearAcorde(a) {
-  let n=a, q='may';
-  for (const s of ['dim','m']) {
-    if (a.endsWith(s)) { n=a.slice(0,-s.length); q=s; break; }
-  }
-  try { return { s: parsearNota(n).s, q }; } catch { return null; }
-}
-
-function coinciden(a, b) {
-  const pa=parsearAcorde(a), pb=parsearAcorde(b);
-  return pa && pb && pa.s===pb.s && pa.q===pb.q;
-}
 
 /* ═══════════════════════════════════════════════
    ESTADO
@@ -772,7 +735,7 @@ function generar() {
     const r = RAICES[Math.floor(Math.random()*RAICES.length)];
     const t = Math.random()<.5 ? 'mayor' : 'menor';
     const g = Math.floor(Math.random()*7);
-    const e = construirEscala(r, t);
+    const e = construirEscalaSimple(r, t);
     qs.push({ r, t, g, nEsc: nombEsc(r,t), resp: e[g] });
   }
   return qs;

@@ -227,7 +227,62 @@ function generarTodasLasEscalas() {
   return escalas;
 }
 
+/* ═══════════════════════════════════════════════
+   FUNCIONES DE COMPATIBILIDAD PARA MODULOS I Y II
+═══════════════════════════════════════════════ */
+
+/**
+ * Nombra una escala segun su raiz y tipo.
+ * @param {string} r - Raiz (C, D, E, etc)
+ * @param {string} t - Tipo ('mayor' o 'menor')
+ * @returns {string} - Nombre de la escala (ej: "C", "Am")
+ */
+function nombrarEscala(r, t) {
+  return r + (t === 'mayor' ? '' : 'm');
+}
+
+/**
+ * Comprueba si dos acordes coinciden (misma nota base y calidad).
+ * @param {string} a - Primer acorde
+ * @param {string} b - Segundo acorde
+ * @returns {boolean} - True si coinciden
+ */
+function coincidenAcordes(a, b) {
+  const aa = analizarAcorde(a);
+  const ab = analizarAcorde(b);
+  return aa && ab && aa.semitono === ab.semitono && aa.calidad === ab.calidad;
+}
+
+/**
+ * Construye escala en formato simplificado (array de strings).
+ * Para compatibilidad con modulo1.
+ * @param {string} raiz - Raiz de la escala
+ * @param {string} tipo - 'mayor' o 'menor'
+ * @returns {Array<string>} - Array de acordes
+ */
+function construirEscalaSimple(raiz, tipo) {
+  const escala = construirEscala(raiz, tipo);
+  return escala.map(g => g.acorde);
+}
+
+// Alias para compatibilidad con modulo1 y modulo2
+const parsearNota = analizarNota;
+const parsearAcorde = analizarAcorde;
+const nombEsc = nombrarEscala;
+const coinciden = coincidenAcordes;
+
 // Exportar para uso en modulos (Node.js) o como globales (browser)
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { obtenerRelativo, obtenerRelativosFuente, generarTodasLasEscalas, construirEscala };
+  module.exports = { 
+    obtenerRelativo, 
+    obtenerRelativosFuente, 
+    generarTodasLasEscalas, 
+    construirEscala,
+    construirEscalaSimple,
+    nombrarEscala,
+    coincidenAcordes,
+    analizarNota,
+    analizarAcorde,
+    deletrear
+  };
 }
