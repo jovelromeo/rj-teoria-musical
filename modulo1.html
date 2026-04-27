@@ -539,6 +539,104 @@ hr.sep {
   background: var(--surface2);
 }
 
+/* ══════════════════════════════════════════
+   PANTALLA CONFIGURACIÓN
+══════════════════════════════════════════ */
+
+.escalas-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.escala-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.escala-card:hover {
+  border-color: var(--border2);
+  background: var(--surface2);
+}
+.escala-card input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.escala-info { flex: 1; }
+.escala-titulo {
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.escala-rel {
+  font-size: 12.5px;
+  color: var(--text-mid);
+  margin-bottom: 4px;
+}
+.escala-genres {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.escalas-extra-wrap { margin-bottom: 28px; }
+
+.escalas-extra-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.escalas-extra-toggle:hover {
+  border-color: var(--border2);
+  background: var(--surface2);
+}
+.toggle-ico {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.escalas-extra-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+.escalas-extra-panel.abierto {
+  grid-template-rows: 1fr;
+}
+.escalas-extra-panel > .escalas-grid {
+  overflow: hidden;
+  padding-top: 0;
+  transition: padding-top 0.3s ease;
+}
+.escalas-extra-panel.abierto > .escalas-grid {
+  padding-top: 10px;
+}
+
 @media (max-width: 440px) {
   .grados-wrap   { grid-template-columns: 1fr; }
   .stats-row     { grid-template-columns: 1fr 1fr; }
@@ -614,7 +712,34 @@ hr.sep {
       </div>
     </div>
 
-    <button class="btn-primario" onclick="iniciarJuego()">Comenzar — 10 preguntas</button>
+    <button class="btn-primario" onclick="mostrar('config')">Configurar y comenzar</button>
+  </div>
+
+  <!-- ══ CONFIGURACIÓN DE ESCALAS ══ -->
+  <div id="config" class="pantalla">
+    <div class="cabecera" style="margin-bottom:22px">
+      <div class="sup-label">personaliza tu sesión</div>
+      <div class="titulo">Escalas para practicar</div>
+    </div>
+
+    <div class="micro" style="margin-bottom:12px">Selecciona las escalas</div>
+
+    <div class="escalas-grid" id="escalas-grid"></div>
+
+    <div class="escalas-extra-wrap">
+      <button class="escalas-extra-toggle" onclick="toggleExtraEscalas()" id="extra-toggle">
+        <span>Más escalas</span>
+        <span class="toggle-ico" id="toggle-ico">▼</span>
+      </button>
+      <div class="escalas-extra-panel" id="extra-panel">
+        <div class="escalas-grid" id="escalas-extra-grid"></div>
+      </div>
+    </div>
+
+    <div class="config-actions">
+      <button class="btn-primario" onclick="iniciarJuego()">Comenzar — 10 preguntas</button>
+      <button class="btn-secundario" onclick="mostrar('inicio')" style="margin-top:10px">← Volver</button>
+    </div>
   </div>
 
   <!-- ══ JUEGO ══ -->
@@ -712,19 +837,82 @@ const RAICES_MOD1 = ['C','G','D','A','E','B','F#','C#','F','Bb','Eb','Ab','Db','
 const ORDS   = ['','1.°','2.°','3.°','4.°','5.°','6.°','7.°'];
 const ORDS_RO = ['','I','II','III','IV','V','VI','VII'];
 
+const ESCALAS_PRE = [
+  { major: 'C',  minor: 'A',  genres: 'Clásica, pop, bandas sonoras' },
+  { major: 'G',  minor: 'E',  genres: 'Rock, metal, folk' },
+  { major: 'D',  minor: 'B',  genres: 'Country, pop, baladas' },
+  { major: 'A',  minor: 'F#', genres: 'Pop, rock' },
+  { major: 'E',  minor: 'C#', genres: 'Pop punk, EDM, pop moderno' },
+  { major: 'F',  minor: 'D',  genres: 'Pop emocional, cine, clásica' },
+  { major: 'Bb', minor: 'G',  genres: 'Jazz, hip-hop, R&B, drama' },
+];
+
 /* ═══════════════════════════════════════════════
    ESTADO
 ═══════════════════════════════════════════════ */
 let preguntas=[], actual=0, correctas=0, respondido=false, historial=[];
 
+function renderEscalasConfig() {
+  const grid = document.getElementById('escalas-grid');
+  grid.innerHTML = ESCALAS_PRE.map((esc, i) => `
+    <label class="escala-card">
+      <input type="checkbox" value="${i}" checked>
+      <div class="escala-info">
+        <div class="escala-titulo">${esc.major} Mayor</div>
+        <div class="escala-rel">Relativa menor: ${esc.minor}m</div>
+        <div class="escala-genres">${esc.genres}</div>
+      </div>
+    </label>
+  `).join('');
+
+  // Escalas adicionales (raíces de RAICES_MOD1 no presentes como mayor en predefinidas)
+  const usadas = new Set(ESCALAS_PRE.map(e => e.major));
+  const extraRoots = RAICES_MOD1.filter(r => !usadas.has(r));
+  const extraGrid = document.getElementById('escalas-extra-grid');
+  extraGrid.innerHTML = extraRoots.map(r => `
+    <label class="escala-card">
+      <input type="checkbox" value="${r}">
+      <div class="escala-info">
+        <div class="escala-titulo">${r} Mayor / ${r}m</div>
+        <div class="escala-genres">Escala adicional</div>
+      </div>
+    </label>
+  `).join('');
+}
+
+function toggleExtraEscalas() {
+  const panel = document.getElementById('extra-panel');
+  const ico = document.getElementById('toggle-ico');
+  const abierto = panel.classList.toggle('abierto');
+  ico.style.transform = abierto ? 'rotate(180deg)' : '';
+}
+
 function generar() {
+  const preBoxes = document.querySelectorAll('#escalas-grid input[type="checkbox"]:checked');
+  const extraBoxes = document.querySelectorAll('#escalas-extra-grid input[type="checkbox"]:checked');
+
+  const pool = [];
+
+  Array.from(preBoxes).forEach(cb => {
+    const esc = ESCALAS_PRE[parseInt(cb.value)];
+    pool.push({ r: esc.major, t: 'mayor' });
+    pool.push({ r: esc.minor, t: 'menor' });
+  });
+
+  Array.from(extraBoxes).forEach(cb => {
+    const r = cb.value;
+    pool.push({ r, t: 'mayor' });
+    pool.push({ r, t: 'menor' });
+  });
+
+  if (pool.length === 0) return [];
+
   const qs=[];
   while (qs.length<10) {
-    const r = RAICES_MOD1[Math.floor(Math.random()*RAICES_MOD1.length)];
-    const t = Math.random()<.5 ? 'mayor' : 'menor';
+    const s = pool[Math.floor(Math.random()*pool.length)];
     const g = Math.floor(Math.random()*7);
-    const e = construirEscalaSimple(r, t);
-    qs.push({ r, t, g, nEsc: nombEsc(r,t), resp: e[g] });
+    const e = construirEscalaSimple(s.r, s.t);
+    qs.push({ r: s.r, t: s.t, g, nEsc: nombEsc(s.r,s.t), resp: e[g] });
   }
   return qs;
 }
@@ -799,6 +987,10 @@ function mostrarRetro(ok, q) {
 ═══════════════════════════════════════════════ */
 function iniciarJuego() {
   preguntas=generar(); actual=0; correctas=0; respondido=false; historial=[];
+  if (preguntas.length === 0) {
+    alert('Selecciona al menos una escala para comenzar.');
+    return;
+  }
   mostrar('juego');
   cargar();
 }
@@ -828,7 +1020,7 @@ function mostrarResultado() {
   const pct = Math.round(correctas/10*100);
   document.getElementById('res-num').innerHTML   = correctas+'<span>/10</span>';
   document.getElementById('s-ok').textContent    = correctas;
-  document.getElementById('s-err').textContent   = 20-correctas;
+  document.getElementById('s-err').textContent   = 10-correctas;
   document.getElementById('s-pct').textContent   = pct+'%';
   document.getElementById('res-precision').textContent = pct+'% de precisión';
   document.getElementById('res-veredicto').textContent =
@@ -847,6 +1039,8 @@ function mostrarResultado() {
 }
 
 function reiniciar() { mostrar('inicio'); }
+
+renderEscalasConfig();
 
 /* teclado */
 document.addEventListener('keydown', e => {

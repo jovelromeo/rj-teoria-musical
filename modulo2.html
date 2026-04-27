@@ -347,8 +347,6 @@ hr.sep {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 420px;
-  overflow-y: auto;
 }
 
 .grado-row {
@@ -876,27 +874,28 @@ function verificar() {
   respondido = true;
   let aciertosEscala = 0;
   
-  // Evaluar cada grado
-  q.escala.forEach((grado, idx) => {
+  // Evaluar cada grado (solo grados II-VII, índices 1-6)
+  for (let idx = 1; idx < 7; idx++) {
+    const grado = q.escala[idx];
     const seleccionada = selecciones[idx];
-    const correcta = grado.nota;
-    const esCorrecta = seleccionada === correcta;
+    const correcta = grado.acorde;
+    const esCorrecta = coincidenAcordes(seleccionada, correcta);
     
     if (esCorrecta) aciertosEscala++;
     
     const row = document.querySelector(`.grado-row[data-grado="${idx}"]`);
     row.querySelectorAll('.opcion-btn').forEach(btn => {
       btn.disabled = true;
-      if (btn.dataset.opcion === correcta) {
+      if (coincidenAcordes(btn.dataset.opcion, correcta)) {
         btn.classList.add('correcto');
       } else if (btn.dataset.opcion === seleccionada && !esCorrecta) {
         btn.classList.add('incorrecto');
       }
     });
-  });
+  }
   
-  // Una escala se considera correcta si todos los grados están bien
-  const escalaCorrecta = aciertosEscala === 7;
+  // Una escala se considera correcta si los 6 grados (II-VII) están bien
+  const escalaCorrecta = aciertosEscala === 6;
   if (escalaCorrecta) correctas++;
   
   historial.push({
@@ -912,12 +911,14 @@ function verificar() {
   
   if (escalaCorrecta) {
     retroTexto.innerHTML = `<span class="retro-ok">✓ ¡Perfecto! Todos los grados correctos.</span>`;
+    retro.classList.add('visible');
+    // Auto-avanzar cuando todo es correcto
+    setTimeout(() => avanzar(), 800);
   } else {
     retroTexto.innerHTML = `<span class="retro-err">✗ ${6 - aciertosEscala} grado(s) incorrecto(s). Revisa las respuestas marcadas.</span>`;
+    retro.classList.add('visible');
+    document.getElementById('btn-verif').textContent = 'Siguiente →';
   }
-  retro.classList.add('visible');
-  
-  document.getElementById('btn-verif').textContent = 'Siguiente →';
 }
 
 function avanzar() {
@@ -945,13 +946,17 @@ function mostrarResultado() {
     pct >= 40 ? 'Sigue practicando.' :
     'Revisa la teoría.';
   
-  document.getElementById('lista-repaso').innerHTML = historial.map((h, i) => `
+  const repasoHTML = historial.length === 0 
+    ? '<div class="item-repaso"><div class="item-q">No hay datos de repaso</div></div>'
+    : historial.map((h, i) => `
     <div class="item-repaso">
       <div class="item-q">${i+1}. ${h.q.nEsc}</div>
-      <div class="${h.correcta ? 'item-r-ok' : 'item-r-err'}">${h.correcta ? '7/7 ✓' : h.aciertos + '/7'}</div>
+      <div class="${h.correcta ? 'item-r-ok' : 'item-r-err'}">${h.aciertos}/6 ${h.correcta ? '✓' : ''}</div>
       <div class="item-ico">${h.correcta ? '✓' : '✗'}</div>
     </div>
   `).join('');
+  
+  document.getElementById('lista-repaso').innerHTML = repasoHTML;
 }
 
 /* ═══════════════════════════════════════════════
