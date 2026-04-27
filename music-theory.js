@@ -61,8 +61,8 @@ function construirEscala(raiz, tipo) {
 }
 
 function analizarAcorde(acorde) {
-  // Formatos: "C", "Am", "F#dim", "Bbm", "C#", etc.
-  const match = acorde.match(/^([A-G])(#|b)?(m|dim)?$/i);
+  // Formatos: "C", "Am", "F#dim", "Bbm", "C#", "F##m", "Bbbdim", etc.
+  const match = acorde.match(/^([A-G])(#|b|##|bb)?(m|dim)?$/i);
   if (!match) return null;
   
   const [, letra, alteracion = '', calidadStr = ''] = match;

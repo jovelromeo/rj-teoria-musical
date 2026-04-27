@@ -737,6 +737,8 @@ let correctas = 0;
 let respondido = false;
 let historial = [];
 let selecciones = {}; // gradoIndex -> opción seleccionada
+let avanzando = false;
+let autoAvanceTimeout = null;
 
 function generar() {
   const qs = [];
@@ -744,7 +746,9 @@ function generar() {
     const r = RAICES_MOD2[Math.floor(Math.random() * RAICES_MOD2.length)];
     const t = Math.random() < 0.5 ? 'mayor' : 'menor';
     const escala = construirEscala(r, t);
-    if (escala.every(g => g.nota !== null)) {
+    // Descartar escalas con dobles alteraciones (## o bb) porque el generador
+    // de opciones y el analizador de acordes no las manejan bien.
+    if (escala.every(g => g.nota !== null && !g.nota.includes('##') && !g.nota.includes('bb'))) {
       qs.push({ r, t, nEsc: nombEsc(r, t), escala });
     }
   }
@@ -771,14 +775,21 @@ function actualizarHud() {
 
 // Generar las 9 opciones para una nota base
 function generarOpciones(notaBase) {
-  // notaBase es como "A", "Bm", "C#dim"
-  const match = notaBase.match(/^([A-G])(#|b)?(m|dim)?$/);
+  // notaBase es como "A", "F##", "Bbb"
+  const match = notaBase.match(/^([A-G])(#|b|##|bb)?$/);
   if (!match) return [];
-  
-  const [, letra, alteracion = '', calidad = ''] = match;
+
+  const [, letra, alteracion = ''] = match;
   const calidades = ['', 'm', 'dim'];
-  const alteraciones = ['', '#', 'b'];
-  
+
+  // Incluir la alteración real y las vecinas (natural, #, b).
+  // Para dobles alteraciones se reemplaza la menos probable para mantener 9 opciones.
+  let alteraciones = ['', '#', 'b'];
+  if (alteracion && !alteraciones.includes(alteracion)) {
+    if (alteracion === '##') alteraciones = ['', '#', '##'];
+    else if (alteracion === 'bb') alteraciones = ['', 'b', 'bb'];
+  }
+
   const opciones = [];
   for (const alt of alteraciones) {
     for (const cal of calidades) {
@@ -913,7 +924,7 @@ function verificar() {
     retroTexto.innerHTML = `<span class="retro-ok">✓ ¡Perfecto! Todos los grados correctos.</span>`;
     retro.classList.add('visible');
     // Auto-avanzar cuando todo es correcto
-    setTimeout(() => avanzar(), 800);
+    autoAvanceTimeout = setTimeout(() => avanzar(), 800);
   } else {
     retroTexto.innerHTML = `<span class="retro-err">✗ ${6 - aciertosEscala} grado(s) incorrecto(s). Revisa las respuestas marcadas.</span>`;
     retro.classList.add('visible');
@@ -922,12 +933,19 @@ function verificar() {
 }
 
 function avanzar() {
+  if (avanzando) return;
+  avanzando = true;
+  if (autoAvanceTimeout) {
+    clearTimeout(autoAvanceTimeout);
+    autoAvanceTimeout = null;
+  }
   actual++;
   if (actual >= 10) {
     mostrarResultado();
   } else {
     cargar();
   }
+  setTimeout(() => { avanzando = false; }, 150);
 }
 
 function mostrarResultado() {

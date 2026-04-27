@@ -541,21 +541,16 @@ body {
     <div class="seccion">
       <div class="seccion-titulo">Buscar acorde relativo</div>
       <div class="seccion-desc">
-        Ingresa una tonalidad, modo y numero de grado para obtener el acorde correspondiente.
-        <br>Ejemplo: <strong>obtenerRelativo({ tono: 'C', modo: 'M', numero: 2 })</strong> = "Dm"
+        Ingresa una tonalidad (ej: <strong>C</strong> para mayor, <strong>Cm</strong> o <strong>Am</strong> para menor)
+        y un numero de grado para obtener el acorde correspondiente.
+        <br>Ejemplo: <strong>C</strong> + grado 2 = "Dm" &nbsp;·&nbsp; <strong>Am</strong> + grado 5 = "Em"
       </div>
       
       <div class="input-group">
         <div class="input-wrap">
           <label>Tonalidad</label>
-          <input type="text" class="input-field small" id="gr-tono" placeholder="C" value="C">
-        </div>
-        <div class="input-wrap">
-          <label>Modo</label>
-          <select class="input-field" id="gr-modo" style="min-width: 100px;">
-            <option value="M">Mayor (M)</option>
-            <option value="m">Menor (m)</option>
-          </select>
+          <input type="text" class="input-field" id="gr-tono" placeholder="C o Cm" value="C"
+            autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
         </div>
         <div class="input-wrap">
           <label>Grado (1-7)</label>
@@ -668,35 +663,39 @@ function cambiarTab(tabId) {
 ═══════════════════════════════════════════════ */
 
 function ejecutarObtenerRelativo() {
-  const tono = document.getElementById('gr-tono').value.trim();
-  const modo = document.getElementById('gr-modo').value;
+  const input = document.getElementById('gr-tono').value.trim();
   const numero = parseInt(document.getElementById('gr-numero').value);
-  
-  if (!tono || isNaN(numero)) {
-    document.getElementById('gr-resultado').innerHTML = 
-      '<div class="resultado-vacio" style="color: var(--err);">Por favor completa todos los campos</div>';
+
+  if (!input || isNaN(numero)) {
+    document.getElementById('gr-resultado').innerHTML =
+      '<div class="resultado-vacio" style="color: var(--err);">Por favor ingresa una tonalidad y un grado</div>';
     return;
   }
-  
+
+  // Parsear modo desde el texto: Cm / Am → menor; C / A → mayor
+  const modo = input.toLowerCase().endsWith('m') ? 'm' : 'M';
+  const tono = input;
+  const raizLimpia = modo === 'm' ? input.slice(0, -1) : input;
+
   const resultado = obtenerRelativo({ tono, modo, numero });
-  
+
   if (!resultado) {
-    document.getElementById('gr-resultado').innerHTML = 
+    document.getElementById('gr-resultado').innerHTML =
       '<div class="resultado-vacio" style="color: var(--err);">No se pudo calcular el relativo. Verifica los datos.</div>';
     return;
   }
-  
+
   const modoTexto = modo === 'M' ? 'mayor' : 'menor';
   const gradoRoman = ['I','II','III','IV','V','VI','VII'][numero - 1];
-  
+
   document.getElementById('gr-resultado').innerHTML = `
     <div class="resultado-titulo">Resultado</div>
     <div class="resultado-valor">${resultado}</div>
     <div style="margin-top: 8px; font-size: 13px; color: var(--text-mid);">
-      El ${gradoRoman} grado de <strong>${tono} ${modoTexto}</strong> es <strong>${resultado}</strong>
+      El ${gradoRoman} grado de <strong>${raizLimpia} ${modoTexto}</strong> es <strong>${resultado}</strong>
     </div>
   `;
-  
+
   renderEscalasConDestacado(tono, modo, numero, resultado);
 }
 
